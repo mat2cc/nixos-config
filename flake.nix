@@ -21,24 +21,35 @@
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, home-manager, nix-darwin, ... }@inputs: {
+  outputs = inputs @ { 
+    self, 
+    nixpkgs, 
+    home-manager, 
+    nix-darwin, 
+    ... 
+  }: {
     nixosConfigurations = {
-      nixos = nixpkgs.lib.nixosSystem {
-        # enable the following when we have multiple hosts
-        # nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
-        specialArgs = { inherit inputs; };
-        modules = [
-          ./hosts/nixos/configuration.nix
-          home-manager.nixosModules.home-manager
-          {
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
-            home-manager.users.mattc = ./hosts/nixos/home.nix;
+      nixos = let
+        username = "mattc";
+        specialArgs = { inherit inputs username; };
+      in
+        nixpkgs.lib.nixosSystem {
+          inherit specialArgs;
+          # specialArgs = inputs // {inherit myargs;};
+          system = "x86_64-linux";
+          # specialArgs = { inherit inputs; } // {inherit username; };
+          modules = [
+            ./hosts/nixos/configuration.nix
+            home-manager.nixosModules.home-manager
+            {
+              home-manager.useGlobalPkgs = true;
+              home-manager.useUserPackages = true;
+              home-manager.users.${username} = ./hosts/nixos/home.nix;
 
-            home-manager.extraSpecialArgs = { inherit inputs; };
-          }
-        ];
-      };
+              home-manager.extraSpecialArgs = specialArgs;
+            }
+          ];
+        };
       rpi4 = nixpkgs.lib.nixosSystem {
         # enable the following when we have multiple hosts
         # nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";

@@ -10,6 +10,7 @@ require("config.lazy")
 -- dracula, dracula-soft
 
 vim.cmd.colorscheme "dracula"
+vim.lsp.enable('nixd')
 
 -- light scheme
 -- vim.cmd.colorscheme "tokyonight-day"

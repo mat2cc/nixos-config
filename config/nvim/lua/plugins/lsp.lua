@@ -3,7 +3,9 @@ return {
 	lazy = false,
 	dependencies = {
 		{ "mason-org/mason.nvim", opts = {}, cmd = "Mason", lazy = false },
-		{ "neovim/nvim-lspconfig" },
+		{
+          "neovim/nvim-lspconfig",
+        },
 		{
 			"hrsh7th/nvim-cmp",
 			opts = function(_, opts)

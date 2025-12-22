@@ -2,7 +2,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, ... }:
+{ pkgs, inputs, username, ... }:
 
 {
   imports =
@@ -37,19 +37,19 @@
   # services.xserver.displayManager.gdm.enable = true;
   # services.xserver.desktopManager.gnome.enable = true;
 
-  programs.sway = {
-    enable = true;
-    wrapperFeatures.gtk = true;
-  };
+  # Required for sway
+  security.polkit.enable = true;
 
+  # programs.sway = {
+  #   enable = true;
+  #   wrapperFeatures.gtk = true;
+  # };
+  #
   # Configure keymap in X11
   services.xserver.xkb = {
     layout = "us";
     variant = "";
   };
-
-  # Enable CUPS to print documents.
-  services.printing.enable = true;
 
   # Enable sound with pipewire.
   services.pulseaudio.enable = false;
@@ -71,13 +71,10 @@
   # services.xserver.libinput.enable = true;
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
-  users.users.mattc = {
+  users.users.${username} = {
     isNormalUser = true;
     description = "Matthew Christofides";
     extraGroups = [ "networkmanager" "wheel" ];
-    packages = with pkgs; [
-    #  thunderbird
-    ];
   };
 
   # Allow unfree packages
@@ -88,9 +85,12 @@
   environment.systemPackages = with pkgs; [
     wget
     neovim
+    nixd
     # fishPlugins.tide
     # git
   ];
+
+  nix.nixPath = [ "nixpkgs=${inputs.nixpkgs}" ];
 
   programs.bash = {
     interactiveShellInit = ''
@@ -110,6 +110,15 @@
     };
   };
 
+  services.greetd = {                                                      
+    enable = true;                                                         
+    settings = {                                                           
+      default_session = {                                                  
+        command = "${pkgs.tuigreet}/bin/tuigreet --time --cmd sway";
+        user = "greeter";                                                  
+      };                                                                   
+    };                                                                     
+};
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
