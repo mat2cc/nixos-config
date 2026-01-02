@@ -19,6 +19,8 @@
 
     nix-darwin.url = "github:nix-darwin/nix-darwin/master";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
+
+    sops-nix.url = "github:Mic92/sops-nix";
   };
 
   outputs = inputs @ { 
@@ -47,6 +49,9 @@
               home-manager.users.${username} = ./hosts/nixos/home.nix;
 
               home-manager.extraSpecialArgs = specialArgs;
+              home-manager.sharedModules = [
+                inputs.sops-nix.homeManagerModules.sops
+              ];
             }
           ];
         };

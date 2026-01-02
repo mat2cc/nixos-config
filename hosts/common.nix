@@ -14,6 +14,15 @@
     recursive = true;   # link recursively
   };
 
+  home.file.".local/bin" = {
+    source = ../bin;
+    recursive = true;   # link recursively
+  };
+  
+  home.file.".ssh/github.pub".text = ''
+    ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJga3M0uFszaym/QTX5vHnGcCgb53M3Mcj4FeImcOFU5 matthewchristofides@gmail.com
+  '';
+
   programs.git = {
     enable = true;
     settings.user = {
@@ -39,12 +48,15 @@
   home.packages = with pkgs; [
     sops
 
+    xclip
+    neovim
     gcc
     tmux
     ripgrep
     fzf
     bluetui # gui
     gh
+    tealdeer
 
     # here is some command line tools I use frequently
     # feel free to add your own or remove some of them
