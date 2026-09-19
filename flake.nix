@@ -4,6 +4,9 @@
   inputs = {
     # NixOS official package source, using the nixos-25.05 branch here
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    claude-code.url = "github:sadjow/claude-code-nix";
+    tuxedo.url = "github:webstonehq/tuxedo";
+    tuxedo.inputs.nixpkgs.follows = "nixpkgs";
     home-manager = {
       url = "github:nix-community/home-manager";
       # The `follows` keyword in inputs is used for inheritance.
@@ -28,8 +31,13 @@
     nixpkgs, 
     home-manager, 
     nix-darwin, 
+    claude-code,
     ... 
-  }: {
+  }: 
+  let 
+      system = "x86_64-linux";
+      pkgs = nixpkgs.legacyPackages.${system};
+  in {
     nixosConfigurations = {
       nixos = let
         username = "mattc";

@@ -1,9 +1,13 @@
 #!/usr/bin/env bash
 
+static_folders="$HOME/nixos-config"
+
 if [[ $# -eq 1 ]]; then
     selected=$1
 else
-    selected=$(find ~/.dotfiles/.config ~/dev ~/dev/zig ~/dev/rust ~/dev/go ~/dev/ocaml ~/work -mindepth 1 -maxdepth 1 -type d | fzf)
+    find_query=$(find ~/.dotfiles/.config ~/dev ~/dev/zig ~/dev/rust ~/dev/go ~/dev/ocaml ~/work -mindepth 1 -maxdepth 1 -type d)
+    find_query+=$'\n'"$static_folders"
+    selected=$(echo "$find_query" | fzf)
 fi
 
 if [[ -z $selected ]]; then

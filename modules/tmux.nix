@@ -21,7 +21,7 @@
       cfg = config.myprograms.tmux;
       playBindings = ''
         bind -r a switch-client -t "nixos-config"
-        bind -r o switch-client -t "chip8"
+        bind -r o switch-client -t "chess"
         bind -r e switch-client -t ""
         bind -r u switch-client -t ""
         bind -r i switch-client -t ""
@@ -62,6 +62,14 @@
         set-window-option -g mode-keys vi
         set -g mouse on
 
+        # Mouse wheel scroll speed. tmux's default binding is -N 5, which on top
+        # of Ghostty's discrete scroll multiplier makes one notch fly. Lower the
+        # -N to slow it further; raise it to speed it back up.
+        bind-key -T copy-mode    WheelUpPane   select-pane \; send-keys -X -N 2 scroll-up
+        bind-key -T copy-mode    WheelDownPane select-pane \; send-keys -X -N 2 scroll-down
+        bind-key -T copy-mode-vi WheelUpPane   select-pane \; send-keys -X -N 2 scroll-up
+        bind-key -T copy-mode-vi WheelDownPane select-pane \; send-keys -X -N 2 scroll-down
+
         #bind t send-key C-t
         # Reload settings
         bind r source-file ~/.config/tmux/tmux.conf \; display "Reloaded!"
@@ -80,6 +88,8 @@
         bind -r m resize-pane -Z
 
         #### basic settings
+        set -g extended-keys on
+        set -g extended-keys-format csi-u
 
         set-option -g status-justify "left"
         #set-option utf8-default on

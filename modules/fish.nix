@@ -2,9 +2,9 @@
 {
   programs.fish = {
     enable = true;
-    interactiveShellInit = ''
-      set fish_greeting # disable geeting
-    '';
+    # interactiveShellInit = ''
+    #   # set fish_greeting # disable geeting
+    # '';
     shellAliases = {
       ls = "eza";
       l = "eza -lah --icons";

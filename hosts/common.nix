@@ -2,17 +2,20 @@
 {
   imports = [
     ../modules/fish.nix 
-    # ../modules/tmux.nix
+    ../modules/code.nix
   ];
+
+
+  myprograms.code.enable = true;
 
   home.username = username;
   home.homeDirectory = "/home/${username}";
 
   # link config files to `~/.config`
-  home.file.".config" = {
-    source = ../config;
-    recursive = true;   # link recursively
-  };
+  # home.file.".config" = {
+  #   source = ../config;
+  #   recursive = true;   # link recursively
+  # };
 
   home.file.".local/bin" = {
     source = ../bin;
@@ -47,6 +50,8 @@
 
   home.packages = with pkgs; [
     sops
+    tuxedo # keyboard-driven todo.txt TUI
+
 
     xclip
     neovim
@@ -57,11 +62,12 @@
     bluetui # gui
     gh
     tealdeer
+    killall
 
     # here is some command line tools I use frequently
     # feel free to add your own or remove some of them
 
-    neofetch
+    # neofetch
     nnn # terminal file manager
 
     # archives
@@ -69,7 +75,7 @@
     xz
     unzip
     p7zip
-    pavucontrol
+    # pavucontrol
 
     # utils
     ripgrep # recursively searches directories for a regex pattern

@@ -4,14 +4,43 @@
   imports = [
     ../common.nix
     ../../modules/tmux.nix
+    ../../modules/firstmate.nix
+    ../../modules/openwhispr.nix
+    # ../../modules/code.nix
     inputs.sops-nix.homeManagerModules.sops
   ];
+
+  myprograms.firstmate.enable = true;
+  myprograms.openwhispr.enable = true;
 
   home.file.".ssh/rpi4.pub".text = ''
     ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIjTv5iYdJm96i/yANv4bCqJiV3XuAacO5uKrW3cCGdc mattc@nixos
   '';
 
   myprograms.tmux.tmuxType = "play";
+
+  # Convenience symlinks to the secondary drives declared in modules/drives.nix.
+  # mkOutOfStoreSymlink points at the live path rather than copying anything
+  # into the nix store, so these stay live mounts and not frozen snapshots.
+  home.file."seagate_st8000".source = config.lib.file.mkOutOfStoreSymlink "/mnt/seagate_st8000";
+  home.file."samsung_980_pro".source = config.lib.file.mkOutOfStoreSymlink "/mnt/samsung_980_pro";
+  home.file."samsung_990_evo".source = config.lib.file.mkOutOfStoreSymlink "/mnt/samsung_990_evo";
+
+  # Steam libraries left behind by the old Windows / Ubuntu / Arch installs,
+  # grouped so they don't clutter $HOME. Sizes are as of the Sep 2026 survey.
+  #
+  # arch-old_steam is the 642G library rescued from the old /mnt/wd_black. A
+  # stale second snapshot alongside it (old_steam/SteamLibrary) was deleted on
+  # 2026-09-03 to reclaim ~630G; its Proton prefixes for the only two games
+  # that differed are archived in ~/steam-old-prefix-backup.
+  home.file."steam-libraries/arch-old_steam".source =
+    config.lib.file.mkOutOfStoreSymlink "/mnt/samsung_990_evo/@home/mattc/old_steam";
+  home.file."steam-libraries/arch-live".source =
+    config.lib.file.mkOutOfStoreSymlink "/mnt/samsung_990_evo/@home/mattc/.local/share/Steam";
+  home.file."steam-libraries/ubuntu".source =
+    config.lib.file.mkOutOfStoreSymlink "/mnt/samsung_980_pro/ubuntu-home/mattc/.local/share/Steam";
+  home.file."steam-libraries/windows".source =
+    config.lib.file.mkOutOfStoreSymlink "/mnt/samsung_980_pro/windows/Program Files (x86)/Steam";
 
   sops.defaultSopsFile = ../../secrets/secrets.yaml;
   sops.defaultSopsFormat = "yaml";
@@ -40,8 +69,49 @@
     };
   };
 
+  # Packages that should be installed to the user profile.
+  home.packages = with pkgs; [
+    # waybar
+    obsidian
+    brave
+    librewolf
+    # claude-code
+    ghostty
+    neovim
+    kitty
+    discord
+    tree-sitter
+    stockfish # UCI engine; the chess project's analysis worker shells out to it
 
-  programs.waybar.enable = true;
+    # protonup-ng
+  ];
+
+  programs.neovim.plugins = with pkgs.vimPlugins; [
+    nvim-treesitter.withAllGrammars
+  ];
+
+  programs.direnv = {
+    enable = true;
+    # enableFishIntegration = true;
+    nix-direnv.enable = true;
+  };
+
+  # xdg.portal = {
+  #   enable = true;
+  #   extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
+  # };
+  gtk = {
+    enable = true;
+  };
+
+  # wayland.windowManager.hyprland = {
+  #   systemd.enable = false;
+  #   settings = {
+  #   };
+  # };
+
+  # 
+  # programs.waybar.enable = true;
   # programs.waybar.settings = {
   #   mainBar = {
   #     layer = "top";
@@ -139,15 +209,11 @@
   # }
   # '';
 
-  # Packages that should be installed to the user profile.
-  home.packages = with pkgs; [
-    # waybar
-    brave
-    librewolf
-    claude-code
-    ghostty # gui
-    neovim
-  ];
+
+  # home.sessionVariables = {
+  #   STEAM_EXTRA_COMPAT_TOOLS_PATHS =
+  #     "\\\${HOME}/.steam/root/compatibilitytools.d";
+  # };
 
   # You can update home Manager without changing this value. See
   # the home Manager release notes for a list of state version
